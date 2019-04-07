@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oliverjam/snek.git"
+    "url": "git+https://github.com/oliverjam/slug.git"
   },
   "keywords": [],
   "author": "Oliver Phillips <op@oliverjam.es> (https://oliverjam.es/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/oliverjam/snek/issues"
+    "url": "https://github.com/oliverjam/slug/issues"
   },
-  "homepage": "https://github.com/oliverjam/snek#readme",
+  "homepage": "https://github.com/oliverjam/slug#readme",
   "dependencies": {
     "htm": "^2.1.1",
     "preact": "^10.0.0-alpha.4"
