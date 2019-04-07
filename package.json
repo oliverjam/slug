@@ -1,0 +1,36 @@
+{
+  "name": "snek",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "servor",
+    "prepare": "pika-web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oliverjam/snek.git"
+  },
+  "keywords": [],
+  "author": "Oliver Phillips <op@oliverjam.es> (https://oliverjam.es/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oliverjam/snek/issues"
+  },
+  "homepage": "https://github.com/oliverjam/snek#readme",
+  "dependencies": {
+    "htm": "^2.1.1",
+    "preact": "^10.0.0-alpha.4"
+  },
+  "@pika/web": {
+    "webDependencies": [
+      "htm",
+      "preact",
+      "preact/hooks"
+    ]
+  },
+  "devDependencies": {
+    "@pika/web": "^0.4.1",
+    "servor": "^2.0.3"
+  }
+}
