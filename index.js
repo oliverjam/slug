@@ -29,41 +29,104 @@ function useInterval(delay, callback) {
   }, [delay]);
 }
 
-// const INITIAL_COORDS = [[2, 4], [3, 4], [4, 4], [5, 4]];
-const INITIAL_COORDS = Array.from({ length: 10 }, (_, i) => [2 + i, 4]);
+// type State = {
+//   game: "initial" | "running" | "paused" | "dead",
+//   dir: "up" | "right" | "down" | "left",
+//   coords: Array<[number, number]>
+// }
+
+const opposite = {
+  up: "down",
+  right: "left",
+  down: "up",
+  left: "right"
+};
+
+function init(initState) {
+  const INITIAL_COORDS = Array.from({ length: 10 }, (_, i) => [2 + i, 4]);
+  return {
+    game: "initial",
+    dir: "right",
+    coords: INITIAL_COORDS
+  };
+}
+
+function reducer(state, action) {
+  console.log(action);
+  switch (action.type) {
+    case "RESET":
+      return init();
+    case "START":
+      console.log({ ...state, game: "running" });
+      return { ...state, game: "running" };
+    case "PAUSE":
+      return { ...state, game: "paused" };
+    case "TURN":
+      return {
+        ...state,
+        dir:
+          action.payload.dir === opposite[state.dir]
+            ? state.dir
+            : action.payload.dir
+      };
+    case "TICK":
+      return {
+        game: action.payload.clash ? "dead" : "running",
+        dir: state.dir,
+        coords: action.payload.clash ? state.coords : action.payload.coords
+      };
+    default:
+      return state;
+  }
+}
 
 function Board({ size = 32, children }) {
-  const [coords, setCoords] = Hooks.useState(INITIAL_COORDS);
-  const [dir, setDir] = Hooks.useState("right");
-  const [game, setGame] = Hooks.useState("running");
-  useInterval(2000, () => {
-    const max = size + 1; // css grid isn't 0 indexed
-    const forward = ["down", "right"].includes(dir);
-    const vertical = ["up", "down"].includes(dir);
-    const inc = x => (forward ? (x + 1) % max : (x - 1 + max) % max);
-    const moveSnek = ([x, y]) => (vertical ? [x, inc(y)] : [inc(x), y]);
-    const snekHead = last(coords);
-    const newHead = moveSnek(snekHead);
-    const newCoords = coords.concat([newHead]).slice(1);
-    const clash = coords.some(([x, y]) => x === newHead[0] && y === newHead[1]);
-    if (clash) setGame("finished");
-    setCoords(clash ? coords : newCoords);
+  const [state, dispatch] = Hooks.useReducer(reducer, undefined, init);
+  const { game, dir, coords } = state;
+  console.log(state);
+  // const [coords, setCoords] = Hooks.useState(INITIAL_COORDS);
+  // const [dir, setDir] = Hooks.useState("right");
+  // const [game, setGame] = Hooks.useState("running");
+  useInterval(200, () => {
+    if (game === "running") {
+      const max = size + 1; // css grid isn't 0 indexed
+      const forward = ["down", "right"].includes(dir);
+      const vertical = ["up", "down"].includes(dir);
+      const inc = x => (forward ? (x + 1) % max : (x - 1 + max) % max);
+      const moveSlug = ([x, y]) => (vertical ? [x, inc(y)] : [inc(x), y]);
+      const slugHead = last(coords);
+      const newHead = moveSlug(slugHead);
+      const clash = coords.some(
+        ([x, y]) => x === newHead[0] && y === newHead[1]
+      );
+      const newCoords = clash ? coords : coords.concat([newHead]).slice(1); // only move if there was no clash
+      // if (clash) setGame("finished");
+      // setCoords(clash ? coords : newCoords);
+      dispatch({ type: "TICK", payload: { coords: newCoords, clash } });
+    }
   });
   // Hooks.useLayoutEffect(() => {
   //   console.log(dir);
   // }, [dir]);
   Hooks.useEffect(() => {
     function handleKeyDown(event) {
-      event.preventDefault();
       switch (event.key) {
         case "ArrowUp":
-          return setDir(prev => (prev === "down" ? "down" : "up"));
+          event.preventDefault();
+          // return setDir(prev => (prev === "down" ? "down" : "up"));
+          return dispatch({ type: "TURN", payload: { dir: "up" } });
         case "ArrowRight":
-          return setDir(prev => (prev === "left" ? "left" : "right"));
+          event.preventDefault();
+          // return setDir(prev => (prev === "left" ? "left" : "right"));
+          return dispatch({ type: "TURN", payload: { dir: "right" } });
         case "ArrowDown":
-          return setDir(prev => (prev === "up" ? "up" : "down"));
+          event.preventDefault();
+          // return setDir(prev => (prev === "up" ? "up" : "down"));
+          return dispatch({ type: "TURN", payload: { dir: "down" } });
         case "ArrowLeft":
-          return setDir(prev => (prev === "right" ? "right" : "left"));
+          event.preventDefault();
+          // return setDir(prev => (prev === "right" ? "right" : "left"));
+          return dispatch({ type: "TURN", payload: { dir: "left" } });
         default:
           return;
       }
@@ -74,7 +137,14 @@ function Board({ size = 32, children }) {
   return html`
     <div>
       <mark>${dir}</mark>
-      <mark>${game === "finished" ? "Dead" : " Playing"}</mark>
+      <br />
+      <mark>${game}</mark>
+      <br />
+      <button
+        onClick=${() => dispatch({ type: game === "dead" ? "RESET" : "START" })}
+      >
+        Start
+      </button>
       <ul
         style=${{
           maxWidth: "50rem",
@@ -84,7 +154,7 @@ function Board({ size = 32, children }) {
           display: "grid",
           gridTemplateColumns: `repeat(${size}, 1fr)`,
           gridTemplateRows: `repeat(${size}, 1fr)`,
-          outline: "1px solid",
+          outline: "1px solid"
         }}
       >
         ${coords.map(
@@ -96,9 +166,7 @@ function Board({ size = 32, children }) {
                   gridRowStart: y,
                   gridColumnStart: x,
                   backgroundColor:
-                    i === coords.length - 1 && game === "finished"
-                      ? "red"
-                      : "#000",
+                    i === coords.length - 1 && game === "dead" ? "red" : "#000"
                 }}
               ></li>
             `
