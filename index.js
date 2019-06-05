@@ -50,7 +50,7 @@ function placeFood(size) {
 }
 
 function init({ size = 32 } = {}) {
-  const INITIAL_COORDS = Array.from({ length: size }, (_, i) => [2 + i, 4]);
+  const INITIAL_COORDS = Array.from({ length: size / 4 }, (_, i) => [2 + i, 4]);
   const INITIAL_FOOD_COORDS = placeFood(size);
   return {
     game: "initial",
@@ -136,19 +136,17 @@ function Board({ size = 32, children }) {
     <div
       style=${{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        padding: "2rem",
+        gridTemplateColumns: "repeat(auto-fit, minmax(80vh, 1fr)",
         gap: "2rem",
+        padding: "2rem",
       }}
     >
       <div
         style=${{
-          maxWidth: "50rem",
-          maxHeight: "50rem",
           width: "80vw",
           height: "80vw",
-          maxWidth: "90vh",
-          maxHeight: "90vh",
+          maxWidth: "80vh",
+          maxHeight: "80vh",
           position: "relative",
           border: "0.5rem solid",
           // backgroundColor: `hsl(220, 10%, ${game === "dead" ? "90%" : "98%"})`,
@@ -211,11 +209,6 @@ function Board({ size = 32, children }) {
               ${game === "initial" ? "Start" : "Restart"}
             </button>
           `}
-      </div>
-      <div>
-        <form>
-          <input />
-        </form>
       </div>
     </div>
   `;
