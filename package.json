@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "servor",
-    "prepare": "pika-web"
+    "prepare": "pika-web",
+    "build": "mkdir public && cp -r web_modules/ public/web_modules && cp index.html public/index.html && cp index.js public/index.js"
   },
   "repository": {
     "type": "git",
