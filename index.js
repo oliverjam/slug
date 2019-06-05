@@ -92,7 +92,6 @@ function reducer(state, action) {
       const foodEaten = newHead[0] === food[0] && newHead[1] === food[1];
       const newCoords = coords.concat([newHead]).slice(foodEaten ? 0 : 1); // only move if there was no clash
       const newFoodCoords = foodEaten ? placeFood(size) : food;
-      console.log(newFoodCoords);
       return {
         ...state,
         game: clash ? "dead" : "running",
